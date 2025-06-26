@@ -1,6 +1,15 @@
 # This source code is licensed under CC BY 4.0 license.
 # Copyright 2024 Samsung Electronics Co., Ltd.
 
+import warnings
+from sklearn.exceptions import UndefinedMetricWarning
+warnings.filterwarnings("ignore", category=UndefinedMetricWarning)
+
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
+
+
 import argparse
 from tabulate import tabulate
 
@@ -25,9 +34,9 @@ parser.add_argument('--train_from_raw_data', help='train from raw data or prepro
                     default=True)
 
 # arguments for preprocessing data
-parser.add_argument('--base_dir', help='Base directory with raw files', type=str, required=True,
-                    default='/usr/share/emotions/data/samsemo/')
-parser.add_argument('--utt_names_path', help='Dir with utterances (text)', type=str, required=True,
+parser.add_argument('--base_dir', help='Base directory with raw files', type=str, required=False,
+                    default='samsemo/')
+parser.add_argument('--utt_names_path', help='Dir with utterances (text)', type=str, required=False,
                     default='final_selection/meta_and_splits/')
 parser.add_argument('--utt_file', help='Name of utt file', type=str, required=False, default='_split_EN.txt')
 parser.add_argument('--meta_path', help='Path of meta file', type=str, required=False,
@@ -44,7 +53,7 @@ parser.add_argument("--batch_size", default=16, type=int, required=False, help="
 parser.add_argument("--max_epochs", default=50, type=int, required=False, help="number of epochs")
 parser.add_argument("--checkpoints_dir", default="checkpoints_emo", type=str, required=False,
                     help="directory to save checkpoints")
-parser.add_argument('--emotions', type=str, default=['anger', 'happiness', 'sadness', 'surprise', 'neutral'],
+parser.add_argument('--emotions', type=str, default=['neutral', 'happiness', 'anger', 'sadness', 'surprise', 'disgust', 'fear'], #['anger', 'happiness', 'sadness', 'surprise', 'neutral'],
                     help='emotions (default: emotions for mosei)')
 parser.add_argument('--modalities', type=str, default='tav')
 parser.add_argument('--clip', type=float, default=0.8, help='gradient clip value (default: 0.8)')
@@ -58,6 +67,8 @@ parser.add_argument('--trans-dim', help='Dimension of the transformer after CNN'
 parser.add_argument('--num_heads', type=int, default=4,
                     help='number of heads for the transformer network (default: 5)')
 parser.add_argument('--when', type=int, default=20, help='when to decay learning rate (default: 20)')
+parser.add_argument('--dropout', type=float, default=0.5, help='Dropout rate to use in the model')
+
 
 args = parser.parse_args()
 
@@ -188,9 +199,9 @@ def main():
     dev_set = Multimodal_Datasets(args.data_path, args.dataset_name, 'valid')
     test_set = Multimodal_Datasets(args.data_path, args.dataset_name, 'test')
 
-    train_loader = torch.utils.data.DataLoader(train_set, batch_size=args.batch_size, shuffle=True, num_workers=63)
-    dev_loader = torch.utils.data.DataLoader(dev_set, batch_size=args.batch_size, shuffle=False, num_workers=63)
-    test_loader = torch.utils.data.DataLoader(test_set, batch_size=args.batch_size, shuffle=False, num_workers=63)
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=args.batch_size, shuffle=True, num_workers=2)
+    dev_loader = torch.utils.data.DataLoader(dev_set, batch_size=args.batch_size, shuffle=False, num_workers=2)
+    test_loader = torch.utils.data.DataLoader(test_set, batch_size=args.batch_size, shuffle=False, num_workers=2)
 
     model_ = EmoModel(args)
 

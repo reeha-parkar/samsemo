@@ -10,8 +10,8 @@ class WrappedTransformerEncoder(nn.Module):
     def __init__(self, dim, num_layers, num_heads):
         super(WrappedTransformerEncoder, self).__init__()
         self.dim = dim
-        encoder_layer = nn.TransformerEncoderLayer(d_model=dim, nhead=num_heads, batch_first=True)
-        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
+        encoder_layer = nn.TransformerEncoderLayer(d_model=dim, nhead=num_heads, batch_first=True) # nn.TransformerEncoderLayer: Implements multi-head self-attention
+        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers) # nn.TransformerEncoder: Stacks multiple encoder layers
         self.cls_emb = nn.Embedding(num_embeddings=1, embedding_dim=dim)
 
     @staticmethod

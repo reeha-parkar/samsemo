@@ -1,0 +1,6 @@
+source jvenv/bin/activate
+
+python3 run.py --train_from_raw_data True --base_dir ./ --utt_names_path data/meta_and_splits/ --utt_file _split_EN.txt --meta_path data/meta_and_splits/meta.pkl --files_path data/EN/ --data_path data/ --dataset_name samsemo_en_article.pkl
+
+# with preprocessed data:
+python3 run.py --train_from_raw_data "" --data_path data/ --dataset_name samsemo_en_article.pkl
